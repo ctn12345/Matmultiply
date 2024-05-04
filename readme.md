@@ -1,6 +1,6 @@
 ### 计算强度
-引入计算强度的目的就是评价这个算法是计算密集还是内存密集，我的想法是……\
-variable: m = 要访问的内存数目,将内存的元素放到寄存器中 \
+引入计算强度的目的就是评价这个算法是计算密集还是内存密集，如果内存密集就想办法设计一些算法缓解这些问题\
+variable: m = 要访问的内存数目,将内存的元素放到cache中 \
  $t_{m}$  = 一次mov cost time   f=number of arithmetic operations \
  $t_{f}$ = time per arithmetic operation   CI= f / m
 Actual time = $f * t_{f} + m * t_{m} = f * t_{f} *(1 + t_{m} / t_{f}*1/CI)$\
