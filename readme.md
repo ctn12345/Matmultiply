@@ -41,7 +41,7 @@ roofline model 它表明的是一个应用程序具有不同算力强度时在�
 我的电脑的CPU是AMD R7 7840H,它的基准频率是3.8GHZ,内核数量是8，单个CPU周期里进行双精度浮点数运算的次数是16(32)，而我的电脑内存基准频率是5600MHZ。
 本地的计算强度为:$\frac{f}m=\frac{3.8*10^9*32*8}{5600 * 10^6 * 2}=86.85$
 
-![alt text](./picture/intensity.png)
+![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/intensity.png)
 
 在本次两者的实验中我发现所有都是内存访问速度限制了运算速度。
 ### 实验一 tile 实验
@@ -417,24 +417,24 @@ for(int row = 0; row < n; row+=block_nums){
 
 在本次实验中给予我最大困惑的就是一开始，分块矩阵乘法计算得到的浮点数运算速率是明显慢于暴力矩阵乘法的速率的，这显然是跟现实不相符合，然后我通过在网上搜索和查询资料知道了可能是for循环控制的开销太大，因此需要适当的增加代码冗余程度，具体如下图所示。
 
-![alt text](冗余程度.png)
+![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/冗余程度.png)
 
 我觉得自己需要明确一个问题，那就是我需要计算的应该是此方法的访存次数是多少和所需要的计算量多少\
 如下图，计算次数$f = 2 * n^3$   访存次数$m=n^3+3*n^2$\
 $intensity=\frac{f}{m}$
 
-![alt text](./picture/不同方法优化.png)
+![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/不同方法优化.png)
 
 如下图，$f=2*n^3\thickspace$$m=n^3/{cacheline}+3*n^2\thickspace$
 $intensity=\frac{f}{m}$
 
-![alt text](./picture/violent_2.png)
+![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/violent_2.png)
 
 而根据网课课程里讲的 $3*blocknums^2$<=size of cache,我的L1 cache 大小为512KB,而一个float占据四个字节，估算上来block_nums大小应该在100左右，因为我们希望自己的blcok_nums能被512整除，所以此次采用了16，32，64，128，256的size来进行运算。\
 
 在本次实验中我对比了五种矩阵相乘的办法，最终根据实验跑得的数据可知block_nums=64的效果应该是最好的。此次的flop计算公式$f=2 * n^{3}$ ①\
 $time = end() - start() ②$  然后由①和②式得到最终的浮点数运算速率为 $v = f / time$
-![alt text](./picture/method.png)
+![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/method.png)
 
 ### 实验二 多线程实验
 
@@ -470,4 +470,4 @@ $time = end() - start() ②$  然后由①和②式得到最终的浮点数运�
 
 实验结果通过如下图所示
 
-![alt text](./picture/multi_threads.png)
+![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/multi_threads.png)
