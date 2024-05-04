@@ -196,20 +196,20 @@ for(int row = 0; row < n; row+=block_nums){
 ![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/冗余程度.png)
 
 我觉得自己需要明确一个问题，那就是我需要计算的应该是此方法的访存次数是多少和所需要的计算量多少\
-如下图，计算次数$f = 2 * n^3$   访存次数$m=n^3+3*n^2$\
-$intensity=\frac{f}{m}$
+如下图，计算次数$`f = 2 * n^3`$   访存次数$`m=n^3+3*n^2`$\
+$`intensity=\frac{f}{m}`$
 
 ![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/不同方法优化.png)
 
-如下图，$f=2*n^3\thickspace$ $m=n^3/{cacheline}+3*n^2\thickspace$
- $intensity=\frac{f}{m}$
+如下图，$`f=2*n^3\thickspace`$ $`m=n^3/{cacheline}+3*n^2\thickspace`$
+ $`intensity=\frac{f}{m}`$
 
 ![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/violent_2.png)
 
-而根据网课课程里讲的 $3*blocknums^2$<=size of cache,我的L1 cache 大小为512KB,而一个float占据四个字节，估算上来block_nums大小应该在100左右，因为我们希望自己的blcok_nums能被512整除，所以此次采用了16，32，64，128，256的size来进行运算。\
+而根据网课课程里讲的 $`3*blocknums^2`$ <=size of cache,我的L1 cache 大小为512KB,而一个float占据四个字节，估算上来block_nums大小应该在100左右，因为我们希望自己的blcok_nums能被512整除，所以此次采用了16，32，64，128，256的size来进行运算。\
 
 在本次实验中我对比了五种矩阵相乘的办法，最终根据实验跑得的数据可知block_nums=64的效果应该是最好的。此次的flop计算公式 $f=2 * n^{3}$ ①\
-$time = end() - start() ②$  然后由①和②式得到最终的浮点数运算速率为 $v = f / time$
+$time = end() - start() ②$  然后由①和②式得到最终的浮点数运算速率为 $`v = f / time`$
 ![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/method.png)
 
 ### 实验二 多线程实验
