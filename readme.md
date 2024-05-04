@@ -6,7 +6,9 @@ variable: m = 要访问的内存数目,将内存的元素放到cache中 \
 Actual time = $f * t_{f} + m * t_{m} = f * t_{f} *(1 + t_{m} / t_{f}*1/CI)$\
 $CI$:key to alrogithm effiecncy         $t_m / t_f$ :key to matchine efficency\
 (General Matrix Multiply)
-为了方便这些计算都没有考虑cacheline的概念，这只是为了方便理解\
+
+为了方便这些计算都没有考虑cacheline的概念，这只是为了方便理解
+
 $m$ = $n^3$ to read each colume of B n times\
     + $n^2$ to read each colume of A once\
     + $2n^2$ to read and write each element of C once\
