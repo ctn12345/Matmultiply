@@ -38,7 +38,7 @@ roofline model 它表明的是一个应用程序具有不同算力强度时在�
 ```
 
 
-我的电脑的CPU是AMD R7 7840H,它的基准频率是3.8GHZ,内核数量是8，单个CPU周期里进行双精度浮点数运算的次数是16(32)，而我的电脑内存基准频率是5600MHZ。
+我的电脑的CPU是AMD R7 7840H,它的基准频率是3.8GHZ,内核数量是8，单个CPU周期里进行双精度浮点数运算的次数是16(32)，而我的电脑内存基准频率是5600MHZ。\
 本地的计算强度为:$\frac{f}m=\frac{3.8*10^9*32*8}{5600 * 10^6 * 2}=86.85$
 
 ![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/intensity.png)
@@ -78,7 +78,7 @@ void block_Multiply(A,B,C){
 
 本地寄存器的优化:它实质上是编译器的优化，将常使用的数据放在寄存器里，而不是L1 cache，它实质上是优化了访存(可以看出它是内存访问的瓶颈)\
 我觉得有必要定义一下以下这些公式成立的条件，首先我们将result数组内容视而不见先，因为它在cache中只需要占据很小一部分内容(一个cacheline),而A数组中的一行数据是需要长期占据在cacheline里的，则我们计算一下n的最小值是多少,我们假设cacheline为64B $n+64n >= 512KB$求得n约等于8066。\
-暴力矩阵求法:$f = 2*n^3 m > 2*n^2 + n^2 / p(重复访问了p次) + n^3$(可能存在L1cache满了的问题)  它的计算强度如此计算 intensity = $f / m = \frac{2*n^3}{2*n^2+n^2/p+n^3}$\
+暴力矩阵求法:$f=2*n^3$  访存次数$m > 2*n^2 + n^2 / p(重复访问了p次) + n^3$(可能存在L1cache满了的问题)  它的计算强度如此计算 intensity = $f / m = \frac{2*n^3}{2*n^2+n^2/p+n^3}$\
 block_nums=16:$f=2*n^3 m= 2*n^2 + 2*N^3*b^2 intensity=\frac{f}{m}=b$\
 block_nums=32:$f=2*n^3 m= 2*n^2 + 2*N^3*b^2 intensity=\frac{f}{m}=b$\
 block_nums=64:$f=2*n^3 m= 2*n^2 + 2*N^3*b^2 intensity=\frac{f}{m}=b$\
@@ -145,7 +145,6 @@ for(int i = 0;i < n;++i){
     }
 ```
 接下来就是重中之重，tile矩阵分块算法上了。它的$f$仍然是$2*n^3$,而它的m是$2*n^2+n^2+N^2*b$,所以它的计算强度是$\frac{f}{m} \approx b$。\
-注意接下来的代码可能有一点冗长…………………………
 ```C
 for(int row = 0; row < n; row+=block_nums){
         for(int col = 0;col < m;col+=block_nums){
@@ -174,236 +173,6 @@ for(int row = 0; row < n; row+=block_nums){
                                 result[block_x][14+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][14+ col];
                                 result[block_x][15+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][15+ col];
                                 break;
-                            case 32:
-                                result[block_x][col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][col];
-                                result[block_x][1+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][1+ col];
-                                result[block_x][2+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][2+ col];
-                                result[block_x][3+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][3+ col];
-                                result[block_x][4+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][4+ col];
-                                result[block_x][5+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][5+ col];
-                                result[block_x][6+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][6+ col];
-                                result[block_x][7+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][7+ col];
-                                result[block_x][8+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][8+ col];
-                                result[block_x][9+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][9+ col];
-                                result[block_x][10+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][10+ col];
-                                result[block_x][11+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][11+ col];
-                                result[block_x][12+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][12+ col];
-                                result[block_x][13+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][13+ col];
-                                result[block_x][14+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][14+ col];
-                                result[block_x][15+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][15+ col];
-                                result[block_x][16+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][16+ col];
-                                result[block_x][17+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][17+ col];
-                                result[block_x][18+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][18+ col];
-                                result[block_x][19+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][19+ col];
-                                result[block_x][20+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][20+ col];
-                                result[block_x][21+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][21+ col];
-                                result[block_x][22+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][22+ col];
-                                result[block_x][23+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][23+ col];
-                                result[block_x][24+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][24+ col];
-                                result[block_x][25+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][25+ col];
-                                result[block_x][26+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][26+ col];
-                                result[block_x][27+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][27+ col];
-                                result[block_x][28+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][28+ col];
-                                result[block_x][29+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][29+ col];
-                                result[block_x][30+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][30+ col];
-                                result[block_x][31+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][31+ col];
-                                break;
-                            case 64:
-                                result[block_x][col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][col];
-                                result[block_x][1+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][1+ col];
-                                result[block_x][2+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][2+ col];
-                                result[block_x][3+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][3+ col];
-                                result[block_x][4+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][4+ col];
-                                result[block_x][5+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][5+ col];
-                                result[block_x][6+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][6+ col];
-                                result[block_x][7+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][7+ col];
-                                result[block_x][8+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][8+ col];
-                                result[block_x][9+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][9+ col];
-                                result[block_x][10+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][10+ col];
-                                result[block_x][11+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][11+ col];
-                                result[block_x][12+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][12+ col];
-                                result[block_x][13+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][13+ col];
-                                result[block_x][14+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][14+ col];
-                                result[block_x][15+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][15+ col];
-                                result[block_x][16+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][16+ col];
-                                result[block_x][17+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][17+ col];
-                                result[block_x][18+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][18+ col];
-                                result[block_x][19+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][19+ col];
-                                result[block_x][20+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][20+ col];
-                                result[block_x][21+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][21+ col];
-                                result[block_x][22+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][22+ col];
-                                result[block_x][23+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][23+ col];
-                                result[block_x][24+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][24+ col];
-                                result[block_x][25+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][25+ col];
-                                result[block_x][26+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][26+ col];
-                                result[block_x][27+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][27+ col];
-                                result[block_x][28+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][28+ col];
-                                result[block_x][29+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][29+ col];
-                                result[block_x][30+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][30+ col];
-                                result[block_x][31+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][31+ col];
-                                result[block_x][32+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][32+ col];
-                                result[block_x][33+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][33+ col];
-                                result[block_x][34+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][34+ col];
-                                result[block_x][35+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][35+ col];
-                                result[block_x][36+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][36+ col];
-                                result[block_x][37+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][37+ col];
-                                result[block_x][38+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][38+ col];
-                                result[block_x][39+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][39+ col];
-                                result[block_x][40+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][40+ col];
-                                result[block_x][41+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][41+ col];
-                                result[block_x][42+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][42+ col];
-                                result[block_x][43+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][43+ col];
-                                result[block_x][44+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][44+ col];
-                                result[block_x][45+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][45+ col];
-                                result[block_x][46+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][46+ col];
-                                result[block_x][47+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][47+ col];
-                                result[block_x][48+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][48+ col];
-                                result[block_x][49+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][49+ col];
-                                result[block_x][50+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][50+ col];
-                                result[block_x][51+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][51+ col];
-                                result[block_x][52+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][52+ col];
-                                result[block_x][53+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][53+ col];
-                                result[block_x][54+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][54+ col];
-                                result[block_x][55+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][55+ col];
-                                result[block_x][56+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][56+ col];
-                                result[block_x][57+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][57+ col];
-                                result[block_x][58+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][58+ col];
-                                result[block_x][59+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][59+ col];
-                                result[block_x][60+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][60+ col];
-                                result[block_x][61+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][61+ col];
-                                result[block_x][62+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][62+ col];
-                                result[block_x][63+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][63+ col];
-                                break;
-                        case 128:
-                             result[block_x][0+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][0+ col];
-                            result[block_x][1+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][1+ col];
-                            result[block_x][2+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][2+ col];
-                            result[block_x][3+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][3+ col];
-                            result[block_x][4+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][4+ col];
-                            result[block_x][5+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][5+ col];
-                            result[block_x][6+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][6+ col];
-                            result[block_x][7+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][7+ col];
-                            result[block_x][8+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][8+ col];
-                            result[block_x][9+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][9+ col];
-                            result[block_x][10+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][10+ col];
-                            result[block_x][11+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][11+ col];
-                            result[block_x][12+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][12+ col];
-                            result[block_x][13+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][13+ col];
-                            result[block_x][14+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][14+ col];
-                            result[block_x][15+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][15+ col];
-                            result[block_x][16+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][16+ col];
-                            result[block_x][17+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][17+ col];
-                            result[block_x][18+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][18+ col];
-                            result[block_x][19+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][19+ col];
-                            result[block_x][20+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][20+ col];
-                            result[block_x][21+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][21+ col];
-                            result[block_x][22+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][22+ col];
-                            result[block_x][23+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][23+ col];
-                            result[block_x][24+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][24+ col];
-                            result[block_x][25+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][25+ col];
-                            result[block_x][26+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][26+ col];
-                            result[block_x][27+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][27+ col];
-                            result[block_x][28+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][28+ col];
-                            result[block_x][29+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][29+ col];
-                            result[block_x][30+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][30+ col];
-                            result[block_x][31+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][31+ col];
-                            result[block_x][32+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][32+ col];
-                            result[block_x][33+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][33+ col];
-                            result[block_x][34+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][34+ col];
-                            result[block_x][35+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][35+ col];
-                            result[block_x][36+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][36+ col];
-                            result[block_x][37+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][37+ col];
-                            result[block_x][38+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][38+ col];
-                            result[block_x][39+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][39+ col];
-                            result[block_x][40+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][40+ col];
-                            result[block_x][41+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][41+ col];
-                            result[block_x][42+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][42+ col];
-                            result[block_x][43+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][43+ col];
-                            result[block_x][44+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][44+ col];
-                            result[block_x][45+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][45+ col];
-                            result[block_x][46+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][46+ col];
-                            result[block_x][47+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][47+ col];
-                            result[block_x][48+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][48+ col];
-                            result[block_x][49+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][49+ col];
-                            result[block_x][50+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][50+ col];
-                            result[block_x][51+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][51+ col];
-                            result[block_x][52+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][52+ col];
-                            result[block_x][53+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][53+ col];
-                            result[block_x][54+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][54+ col];
-                            result[block_x][55+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][55+ col];
-                            result[block_x][56+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][56+ col];
-                            result[block_x][57+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][57+ col];
-                            result[block_x][58+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][58+ col];
-                            result[block_x][59+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][59+ col];
-                            result[block_x][60+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][60+ col];
-                            result[block_x][61+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][61+ col];
-                            result[block_x][62+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][62+ col];
-                            result[block_x][63+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][63+ col];
-                            result[block_x][64+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][64+ col];
-                            result[block_x][65+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][65+ col];
-                            result[block_x][66+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][66+ col];
-                            result[block_x][67+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][67+ col];
-                            result[block_x][68+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][68+ col];
-                            result[block_x][69+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][69+ col];
-                            result[block_x][70+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][70+ col];
-                            result[block_x][71+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][71+ col];
-                            result[block_x][72+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][72+ col];
-                            result[block_x][73+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][73+ col];
-                            result[block_x][74+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][74+ col];
-                            result[block_x][75+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][75+ col];
-                            result[block_x][76+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][76+ col];
-                            result[block_x][77+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][77+ col];
-                            result[block_x][78+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][78+ col];
-                            result[block_x][79+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][79+ col];
-                            result[block_x][80+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][80+ col];
-                            result[block_x][81+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][81+ col];
-                            result[block_x][82+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][82+ col];
-                            result[block_x][83+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][83+ col];
-                            result[block_x][84+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][84+ col];
-                            result[block_x][85+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][85+ col];
-                            result[block_x][86+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][86+ col];
-                            result[block_x][87+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][87+ col];
-                            result[block_x][88+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][88+ col];
-                            result[block_x][89+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][89+ col];
-                            result[block_x][90+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][90+ col];
-                            result[block_x][91+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][91+ col];
-                            result[block_x][92+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][92+ col];
-                            result[block_x][93+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][93+ col];
-                            result[block_x][94+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][94+ col];
-                            result[block_x][95+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][95+ col];
-                            result[block_x][96+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][96+ col];
-                            result[block_x][97+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][97+ col];
-                            result[block_x][98+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][98+ col];
-                            result[block_x][99+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][99+ col];
-                            result[block_x][100+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][100+ col];
-                            result[block_x][101+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][101+ col];
-                            result[block_x][102+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][102+ col];
-                            result[block_x][103+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][103+ col];
-                            result[block_x][104+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][104+ col];
-                            result[block_x][105+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][105+ col];
-                            result[block_x][106+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][106+ col];
-                            result[block_x][107+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][107+ col];
-                            result[block_x][108+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][108+ col];
-                            result[block_x][109+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][109+ col];
-                            result[block_x][110+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][110+ col];
-                            result[block_x][111+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][111+ col];
-                            result[block_x][112+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][112+ col];
-                            result[block_x][113+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][113+ col];
-                            result[block_x][114+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][114+ col];
-                            result[block_x][115+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][115+ col];
-                            result[block_x][116+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][116+ col];
-                            result[block_x][117+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][117+ col];
-                            result[block_x][118+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][118+ col];
-                            result[block_x][119+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][119+ col];
-                            result[block_x][120+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][120+ col];
-                            result[block_x][121+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][121+ col];
-                            result[block_x][122+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][122+ col];
-                            result[block_x][123+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][123+ col];
-                            result[block_x][124+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][124+ col];
-                            result[block_x][125+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][125+ col];
-                            result[block_x][126+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][126+ col];
-                            result[block_x][127+col] += matrix_1[block_x][block_bias] * matrix_2[block_bias][127+ col];
-                            break;
                         }
                         
                    }
