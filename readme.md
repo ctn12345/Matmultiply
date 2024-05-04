@@ -1,9 +1,9 @@
 ### 计算强度
 引入计算强度的目的就是评价这个算法是计算密集还是内存密集，我的想法是……\
 variable: m = 要访问的内存数目,将内存的元素放到寄存器中 \
-$t_{m}$  = 一次mov cost time   f=number of arithmetic operations \
-$t_{f}$ = time per arithmetic operation   CI= f / m
-Actual time = $f * t_{f} + m * t_{m} = f * t_{f} *(1 + t_{m} / t_{f}*1/CI)$\
+ $t_{m}$  = 一次mov cost time   f=number of arithmetic operations \
+ $t_{f}$ = time per arithmetic operation   CI= f / m
+Actual time =$f * t_{f} + m * t_{m} = f * t_{f} *(1 + t_{m} / t_{f}*1/CI)$\
 $CI$:key to alrogithm effiecncy         $t_m / t_f$:key to matchine efficency\
 (General Matrix Multiply)
 
