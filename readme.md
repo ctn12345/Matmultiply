@@ -49,8 +49,8 @@ roofline model 它表明的是一个应用程序具有不同算力强度时在�
 它确定了block_size然后，再依次相乘。\
 首先设置 block 是 $b * b$ 而矩阵维度 $N * N$ ,被分割后矩阵块得到的维度是 $M * M$ \
 理由：因为我们的fast memory是有缓存，也就是cache line,所以我们的fast memory读取相比于没有分block的是它的 $\frac{1}{b}$ 。\
-$m = n^2$ to read each colume of A times once \
-   +$M^3 * b^2$ to read each colume of B times $M^3$ \
+$m = n^2$ to read each colume of A times once
+   +$M^3 * b^2$ to read each colume of B times $M^3$
    +$2 * n^2$ to read and write C once
 
 ```C
