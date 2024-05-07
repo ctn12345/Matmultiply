@@ -46,11 +46,14 @@ roofline model 它表明的是一个应用程序具有不同算力强度时在�
 ![alt text](https://github.com/ctn12345/Matmultiply/blob/master/picture/Intensity.png)
 
 在本次两者的实验中我发现所有都是内存访问速度限制了运算速度。
+
+### 代码分模块介绍
+在本次实验中main.cpp是主程序，而test.cpp是测试多线程的代码，而matrix_multiply.cpp是测试tile、寄存器等算法。
 ### 实验一 tile 实验
 #### 算法原理
 它确定了block_size然后，再依次相乘。\
 首先设置 block 是 $b * b$ 而矩阵维度 $N * N$ ,被分割后矩阵块得到的维度是 $M * M$ \
-理由：因为我们的fast memory是有缓存，也就是cache line,所以我们的fast memory读取相比于没有分block的是它的 $`\frac{1}{b}`$ 。\
+理由：因为我们的fast memory是有缓存，也就是cache,所以我们的fast memory读取相比于没有分block的是它的 $`\frac{1}{b}`$ 。\
 $m = n^2$ to read each colume of A times once \
   +$`M^3 * b^2`$ to read each colume of B times $M^3$ \
   +$`2 * n^2`$ to read and write C once
@@ -85,6 +88,8 @@ block_nums=16: $`f=2*n^3`$ 而内存访问次数 $`m= 2*n^2 + 2*N^3*b^2`$ 它的
 block_nums=32: $`f=2*n^3`$ 而内存访问次数 $`m= 2*n^2 + 2*N^3*b^2`$ 它的计算强度intensity= $\frac{f}{m}=b$ \
 block_nums=64: $`f=2*n^3`$ 而内存访问次数 $`m= 2*n^2 + 2*N^3*b^2`$  它的计算强度intensity= $\frac{f}{m}=b$ \
 block_nums=128: $`f=2*n^3`$ 而内存访问次数 $`m > 2*n^2 + 2*N^3*b^2`$ 它的计算强度intensity= $\frac{f}{m} < b$
+
+注意在这里之所以128不能满足那个计算强度公式是因为，block_nums=128 是会超出cache的size的，所以对于一些元素可能需要多次访问内存。
 
 #### 代码步骤
 
@@ -240,9 +245,22 @@ $time = end() - start() ②$  然后由①和②式得到最终的浮点数运�
     }
 ```
 #### 实验结果分析
-经过估计单个线程的内存访问次数大约是当n>=1024时，它的内存访问次数 $`2N^2+n*N^2+n*N`$ 计算得到Intensity= $`\frac{2N^2*n}{2N^2+2n*N^2}\approx 2`$ 而当n<=768时，它的内存访存次数 $`2N^2+2*n*N`$ 计算得到Intensity= $`\frac{2N^2*n}{2N^2+2n*N}\approx N`$ 当矩阵维度是512或者768时，矩阵运算速率最快。这应该时综合线程切换开销时间跟访存时间的得到的结果
+当n>=1024(这是经过实验证明的，因为当矩阵的维度超过1024时，矩阵运算速度就会下降很多)它的内存访问次数 $`2N^2+n*N^2+n*N`$ 计算得到Intensity= $`\frac{2N^2*n}{2N^2+2n*N^2}\approx 2`$ 而当n<=320时，它的内存访存次数 $`2N^2+2*n*N`$ 计算得到Intensity= $`\frac{2N^2*n}{2N^2+2n*N}\approx N`$ 当矩阵维度是512或者768时，矩阵运算速率最快。这应该是综合线程切换开销时间跟访存时间的得到的结果，具体可能得自己在深入学习才能了解。
 
-另外在此次实验中，我尝试了多线程加速的速度比,经过实验得到16线程的速度是最快的，而根据多次实验观察,multi_threads=16效果是最好的，而在此次实验中矩阵维度是从256到3582,flops在维度为768时差不多达到最大。从数学上也可以解释，$`\sqrt{\sqrt{multithreads}*cachesize} \approx 724`$ 这的确较为符合实验结果！\
+另外在此次实验中，我尝试了多线程加速的速度比,经过实验得到16线程的速度是最快的，而根据多次实验观察,multi_threads=16效果是最好的，而在此次实验中矩阵维度是从256到3582,flops在维度为768和1024时差不多达到最大。
+
+```C
+for(int left_row = 0;left_row < m / x_times;++left_row){
+        x = left_row + start_x;
+        for(int right_col = 0;right_col < p / x_times;right_col++){
+            y = right_col + start_y;
+            for(int left_col = 0;left_col< n; ++left_col){
+                result[x][y] += matrix_1[x][left_col] * matrix_2[left_col][y];
+            }
+        }
+    }
+```
+
 多线程的优点:
 * 多核的参与可以实现并行计算
 * 多核的参与使得L2 cache的size变大，内存访问上更有利
